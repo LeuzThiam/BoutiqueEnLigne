@@ -1,0 +1,64 @@
+@model IEnumerable<BoutiqueEnLigne.Web.Models.Produit>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Page d'accueil";
+}
+
+<!-- HERO SECTION -->
+<section class="py-5 text-white" style="background: linear-gradient(135deg, #007bff, #6610f2);">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold">Bienvenue chez Ma Boutique en ligne !</h1>
+        <p class="lead">Découvrez nos meilleures offres et profitez d'une expérience unique.</p>
+        <a class="btn btn-warning btn-lg mt-3 shadow" asp-controller="Produits" asp-action="Index">
+            <i class="bi bi-bag-plus-fill"></i> Voir tout le catalogue
+        </a>
+    </div>
+</section>
+
+<!-- SECTION PRODUITS POPULAIRES -->
+<section class="container py-5">
+    <h2 class="mb-4 text-center fw-semibold">Produits populaires 🔥</h2>
+    <div class="row g-4">
+
+        @if (Model != null && Model.Any())
+        {
+            foreach (var produit in Model)
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow rounded-4 overflow-hidden">
+                        <div class="position-relative">
+                            <img src="@produit.UrlImage" class="card-img-top" alt="@produit.Nom" style="height: 250px; object-fit: cover;">
+                            <span class="badge bg-danger position-absolute top-0 end-0 m-2">Nouveau</span>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@produit.Nom</h5>
+                            <p class="card-text text-muted small">@produit.Description.Substring(0, Math.Min(80, produit.Description.Length))...</p>
+                            <p class="fw-bold text-primary fs-5">@produit.Prix.ToString("C")</p>
+                            <a href="/Produits/Details/@produit.Id" class="btn btn-outline-primary mt-auto w-100">
+                                <i class="bi bi-eye-fill"></i> Voir détails
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center">
+                <p class="text-muted">Aucun produit disponible actuellement.</p>
+            </div>
+        }
+
+    </div>
+</section>
+
+<!-- SECTION CTA -->
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <h3 class="mb-3">Ne manquez pas nos promotions exclusives ! 🎉</h3>
+        <p class="text-muted">Des réductions jusqu'à -50% sur une sélection de produits.</p>
+        <a class="btn btn-danger btn-lg" asp-controller="Produits" asp-action="Index">Voir les promotions</a>
+    </div>
+</section>

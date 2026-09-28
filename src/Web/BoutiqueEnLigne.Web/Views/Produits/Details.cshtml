@@ -1,0 +1,35 @@
+@model BoutiqueEnLigne.Web.Models.Produit
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Détail du produit";
+}
+
+<div class="container mt-5">
+    <p class="text-muted small">Source de donnees : @(ViewBag.DataSource == "api" ? "backend API" : "base locale")</p>
+    <div class="row">
+        <div class="col-md-6">
+            <img src="@Model.UrlImage" class="img-fluid rounded shadow-sm" alt="@Model.Nom" />
+        </div>
+        <div class="col-md-6">
+            <h2 class="fw-bold mb-3">@Model.Nom</h2>
+            <p><strong>Catégorie :</strong> @Model.CategorieNom</p>
+            <p class="my-4">@Model.Description</p>
+            <p class="fs-4 text-primary fw-bold">Prix : @Model.Prix.ToString("C")</p>
+
+            <div class="d-flex gap-2 mt-4">
+                <form method="post" action="/Panier/Ajouter">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="idProduit" value="@Model.Id" />
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-cart-plus-fill"></i> Ajouter au panier
+                    </button>
+                </form>
+
+                <a href="/Produits/Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour au catalogue
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

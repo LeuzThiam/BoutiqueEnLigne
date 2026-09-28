@@ -1,0 +1,21 @@
+{
+  "version": "3.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "twitter-bootstrap@5.3.3",
+      "destination": "wwwroot/twitter-bootstrap/",
+      "files": [
+        "js/bootstrap.bundle.min.js",
+        "css/bootstrap.min.css"
+      ]
+    },
+    {
+      "library": "bootstrap-icons@1.11.1",
+      "destination": "wwwroot/bootstrap-icons/",
+      "files": [
+        "font/bootstrap-icons.css"
+      ]
+    }
+  ]
+}

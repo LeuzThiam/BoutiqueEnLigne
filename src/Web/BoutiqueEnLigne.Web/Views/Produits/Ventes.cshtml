@@ -1,0 +1,61 @@
+@model IEnumerable<BoutiqueEnLigne.Web.Models.ArticleCommande>
+
+@{
+    ViewBag.Title = "Mes Ventes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var cultureCA = System.Globalization.CultureInfo.GetCultureInfo("fr-CA");
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Mes Ventes Réalisées</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            Vous n'avez encore réalisé aucune vente.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover shadow-sm">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Produit</th>
+                        <th>Quantité</th>
+                        <th>Prix Unitaire</th>
+                        <th>Montant</th>
+                        <th>Date de commande</th>
+                        <th>Client</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var article in Model)
+                    {
+                        <tr>
+                            <td>@article.Produit?.Nom</td>
+                            <td>@article.Quantite</td>
+                            <td>@article.PrixUnitaire.ToString("C", cultureCA)</td>
+                            <td>@(article.Quantite * article.PrixUnitaire) $ CA</td>
+                            <td>@article.Commande?.DateCommande.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @article.Commande?.Utilisateur?.Prenom @article.Commande?.Utilisateur?.Nom
+                            </td>
+                            <td>
+                                @if (article.Commande?.EstPayee == true)
+                                {
+                                    <span class="badge bg-success">Payée</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">En attente</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

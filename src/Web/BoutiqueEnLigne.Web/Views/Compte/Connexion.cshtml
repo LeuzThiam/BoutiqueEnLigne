@@ -1,0 +1,48 @@
+@model BoutiqueEnLigne.Web.Models.Utilisateur
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Connexion";
+}
+
+<section class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 160px);">
+    <div class="card shadow p-4 w-100" style="max-width: 400px;">
+        <h3 class="text-center mb-4">Se connecter</h3>
+
+        @if (ViewBag.MessageErreur != null)
+        {
+            <div class="alert alert-danger">@ViewBag.MessageErreur</div>
+        }
+
+        <form asp-action="Connexion" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" placeholder="exemple@mail.com" required />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="MotDePasse" class="form-label"></label>
+                <input asp-for="MotDePasse" type="password" class="form-control" placeholder="********" required />
+                <span asp-validation-for="MotDePasse" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-box-arrow-in-right"></i> Connexion
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <small>
+                Vous n'avez pas encore de compte ?
+                <a asp-controller="Compte" asp-action="Inscription" class="link-primary">Créer un compte</a>
+            </small>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

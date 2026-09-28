@@ -1,0 +1,180 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Paiement securise";
+    var cultureCA = System.Globalization.CultureInfo.GetCultureInfo("fr-CA");
+    var stripeConfigured = ViewBag.StripeConfigured is bool configured && configured;
+    var stripePublishableKey = ViewBag.StripePublishableKey as string ?? string.Empty;
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h3 class="text-center mb-3">Paiement securise</h3>
+
+                    <p class="text-center text-muted">
+                        Montant total :
+                        <span class="fw-bold text-dark">@ViewBag.Total.ToString("C", cultureCA)</span>
+                    </p>
+
+                    @if (ViewBag.MessageErreur != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.MessageErreur</div>
+                    }
+
+                    @if (stripeConfigured)
+                    {
+                        <form id="payment-form">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nom du detenteur de la carte</label>
+                                <input type="text" id="cardholder-name" class="form-control" placeholder="Ex: Jean Dupont" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Carte bancaire</label>
+                                <div id="card-element" class="form-control p-3"></div>
+                            </div>
+
+                            <button id="submit-payment" class="btn btn-warning w-100 fw-bold" type="submit">
+                                Payer maintenant
+                            </button>
+
+                            <div id="error-message" class="alert alert-danger d-none small mt-3"></div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            Stripe n'est pas configure sur le backend. Le formulaire ci-dessous utilise le mode de paiement simule.
+                        </div>
+
+                        <form asp-action="Index" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="form-label">Nom sur la carte</label>
+                                <input type="text" name="cardName" class="form-control" placeholder="Nom complet" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Numero de carte</label>
+                                <input type="text" name="cardNumber" class="form-control" placeholder="4242 4242 4242 4242" required />
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Date d'expiration</label>
+                                    <input type="text" name="expDate" class="form-control" placeholder="MM/AA" required />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">CVC</label>
+                                    <input type="text" name="cvc" class="form-control" placeholder="3 chiffres" required />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Code postal</label>
+                                <input type="text" name="postalCode" class="form-control" placeholder="Code postal" required />
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100">Proceder au paiement</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (stripeConfigured)
+    {
+        <script src="https://js.stripe.com/v3/"></script>
+        <script>
+            const stripe = Stripe("@stripePublishableKey");
+            const elements = stripe.elements();
+            const card = elements.create("card", {
+                style: {
+                    base: {
+                        color: "#212529",
+                        fontFamily: "Arial, sans-serif",
+                        fontSize: "16px",
+                        "::placeholder": { color: "#adb5bd" }
+                    }
+                }
+            });
+
+            card.mount("#card-element");
+
+            let clientSecret = "";
+
+            fetch("/Paiement/CreatePaymentIntent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount: @ViewBag.TotalEnCents })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.clientSecret) {
+                    showError(data.error || "Impossible d'initialiser le paiement.");
+                    return;
+                }
+
+                clientSecret = data.clientSecret;
+            })
+            .catch(() => showError("Erreur serveur, reessayez."));
+
+            document.getElementById("payment-form").addEventListener("submit", async (event) => {
+                event.preventDefault();
+
+                const cardholderName = document.getElementById("cardholder-name").value.trim();
+                if (!cardholderName) {
+                    showError("Veuillez renseigner le nom du detenteur de la carte.");
+                    return;
+                }
+
+                if (!clientSecret) {
+                    showError("Le paiement n'est pas pret. Reessayez dans quelques secondes.");
+                    return;
+                }
+
+                const result = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: card,
+                        billing_details: {
+                            name: cardholderName
+                        }
+                    }
+                });
+
+                if (result.error) {
+                    showError(result.error.message || "Le paiement a echoue.");
+                    return;
+                }
+
+                if (result.paymentIntent && result.paymentIntent.status === "succeeded") {
+                    fetch("/Paiement/FinaliserCommande", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.redirectUrl) {
+                            showError(data.error || "Erreur lors de la finalisation de la commande.");
+                            return;
+                        }
+
+                        window.location = data.redirectUrl;
+                    })
+                    .catch(() => showError("Erreur lors de la finalisation de la commande."));
+                }
+            });
+
+            function showError(message) {
+                const div = document.getElementById("error-message");
+                div.textContent = message;
+                div.classList.remove("d-none");
+            }
+        </script>
+    }
+}

@@ -1,0 +1,9 @@
+[
+  {
+    "outputFileName": "wwwroot/css/site.min.css",
+    "inputFiles": [
+      "wwwroot/twitter-bootstrap/css/bootstrap-utilities.min.css"
+    ],
+    "minify": { "enabled": true }
+  }
+]

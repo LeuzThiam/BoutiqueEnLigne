@@ -1,0 +1,12 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Erreur";
+}
+
+<section class="container py-5 text-center">
+    <h1 class="display-4 text-danger">Oups ! Une erreur est survenue.</h1>
+    <p class="lead">Il semble que quelque chose ne se soit pas déroulé comme prévu.</p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-4">
+        Retour à l'accueil
+    </a>
+</section>

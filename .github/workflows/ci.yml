@@ -1,0 +1,30 @@
+name: Build and test
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v6
+
+      - name: Installer .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restaurer la solution
+        run: dotnet restore BoutiqueEnLigne.sln
+
+      - name: Compiler la solution
+        run: dotnet build BoutiqueEnLigne.sln --configuration Release --no-restore
+
+      - name: Executer les tests
+        run: dotnet test BoutiqueEnLigne.sln --configuration Release --no-build

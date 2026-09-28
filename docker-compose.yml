@@ -1,0 +1,182 @@
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.136.0
+    container_name: boutique-otel-collector
+    command: ["--config=/etc/otelcol-contrib/config.yml"]
+    volumes:
+      - ./deploy/observability/otel-collector.yml:/etc/otelcol-contrib/config.yml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: boutique-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  redis:
+    image: redis:7-alpine
+    container_name: boutique-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ecommerce-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SQL_SA_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+
+  user-service:
+    build:
+      context: .
+      dockerfile: deploy/docker/dotnet-service.Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Identity/BoutiqueEnLigne.Identity.Api/BoutiqueEnLigne.Identity.Api.csproj
+        APP_DLL: BoutiqueEnLigne.Identity.Api.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=IdentityDb;User Id=sa;Password=${SQL_SA_PASSWORD};TrustServerCertificate=True;Encrypt=False
+      Jwt__SecretKey: ${JWT_SECRET_KEY}
+    ports:
+      - "5001:8080"
+    depends_on:
+      - sqlserver
+
+  product-service:
+    build:
+      context: .
+      dockerfile: deploy/docker/dotnet-service.Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Catalog/BoutiqueEnLigne.Catalog.Api/BoutiqueEnLigne.Catalog.Api.csproj
+        APP_DLL: BoutiqueEnLigne.Catalog.Api.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=ec_product_db;User Id=sa;Password=${SQL_SA_PASSWORD};TrustServerCertificate=True;Encrypt=False
+    ports:
+      - "5002:8080"
+    depends_on:
+      - sqlserver
+
+  order-service:
+    build:
+      context: .
+      dockerfile: deploy/docker/dotnet-service.Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Ordering/BoutiqueEnLigne.Ordering.Api/BoutiqueEnLigne.Ordering.Api.csproj
+        APP_DLL: BoutiqueEnLigne.Ordering.Api.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=OrderingDb;User Id=sa;Password=${SQL_SA_PASSWORD};TrustServerCertificate=True;Encrypt=False
+      Jwt__SecretKey: ${JWT_SECRET_KEY}
+      EventBus__Host: rabbitmq
+      EventBus__UserName: ${RABBITMQ_USER}
+      EventBus__Password: ${RABBITMQ_PASSWORD}
+      OpenTelemetry__OtlpEndpoint: http://otel-collector:4317
+    ports:
+      - "5003:8080"
+    depends_on:
+      - sqlserver
+      - rabbitmq
+
+  cart-service:
+    build:
+      context: .
+      dockerfile: deploy/docker/dotnet-service.Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Cart/BoutiqueEnLigne.Cart.Api/BoutiqueEnLigne.Cart.Api.csproj
+        APP_DLL: BoutiqueEnLigne.Cart.Api.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Redis: redis:6379
+      Jwt__SecretKey: ${JWT_SECRET_KEY}
+    ports:
+      - "5005:8080"
+    depends_on:
+      - redis
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: deploy/docker/dotnet-service.Dockerfile
+      args:
+        PROJECT_PATH: src/Services/Payments/BoutiqueEnLigne.Payments.Api/BoutiqueEnLigne.Payments.Api.csproj
+        APP_DLL: BoutiqueEnLigne.Payments.Api.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      Stripe__SecretKey: ${STRIPE_SECRET_KEY}
+      Stripe__PublishableKey: ${STRIPE_PUBLISHABLE_KEY}
+      Stripe__WebhookSecret: ${STRIPE_WEBHOOK_SECRET}
+      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=PaymentsDb;User Id=sa;Password=${SQL_SA_PASSWORD};TrustServerCertificate=True;Encrypt=False
+      Jwt__SecretKey: ${JWT_SECRET_KEY}
+      EventBus__Host: rabbitmq
+      EventBus__UserName: ${RABBITMQ_USER}
+      EventBus__Password: ${RABBITMQ_PASSWORD}
+      OpenTelemetry__OtlpEndpoint: http://otel-collector:4317
+    ports:
+      - "5004:8080"
+    depends_on:
+      - sqlserver
+      - rabbitmq
+
+  gateway:
+    build:
+      context: .
+      dockerfile: deploy/docker/dotnet-service.Dockerfile
+      args:
+        PROJECT_PATH: src/Gateway/BoutiqueEnLigne.Gateway/BoutiqueEnLigne.Gateway.csproj
+        APP_DLL: BoutiqueEnLigne.Gateway.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      USE_DOCKER_ROUTES: "true"
+    ports:
+      - "5000:8080"
+    depends_on:
+      - user-service
+      - product-service
+      - cart-service
+      - order-service
+      - payment-service
+
+  frontend:
+    build:
+      context: .
+      dockerfile: deploy/docker/dotnet-service.Dockerfile
+      args:
+        PROJECT_PATH: src/Web/BoutiqueEnLigne.Web/BoutiqueEnLigne.Web.csproj
+        APP_DLL: BoutiqueEnLigne.Web.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      DisableHttpsRedirection: "true"
+      BackendApi__BaseUrl: http://gateway:8080/
+      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=BoutiqueEnLigneWebDb;User Id=sa;Password=${SQL_SA_PASSWORD};TrustServerCertificate=True;Encrypt=False
+    ports:
+      - "5212:8080"
+    depends_on:
+      - sqlserver
+      - gateway
+
+volumes:
+  sqlserver-data:
+  redis-data:
+  rabbitmq-data:

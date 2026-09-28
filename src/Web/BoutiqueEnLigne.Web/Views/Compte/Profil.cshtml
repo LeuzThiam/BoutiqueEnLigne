@@ -1,0 +1,55 @@
+@model BoutiqueEnLigne.Web.Models.Utilisateur
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Mon profil";
+}
+
+<section class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <p class="text-muted small text-center">Source de donnees : @(ViewBag.DataSource == "api" ? "backend API" : "base locale")</p>
+                    <h3 class="card-title fw-bold mb-4 text-center">
+                        <i class="bi bi-person-circle"></i> Mon profil
+                    </h3>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-3 fw-semibold">Prénom :</label>
+                        <div class="col-sm-9">@Model.Prenom</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-3 fw-semibold">Nom :</label>
+                        <div class="col-sm-9">@Model.Nom</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-3 fw-semibold">Email :</label>
+                        <div class="col-sm-9">@Model.Email</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-3 fw-semibold">Rôle :</label>
+                        <div class="col-sm-9">
+                            <span class="badge bg-primary">@Model.Role</span>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="d-flex justify-content-center gap-2 mt-4">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour à l'accueil
+                        </a>
+                        <a asp-controller="Compte" asp-action="Deconnexion" class="btn btn-danger">
+                            <i class="bi bi-box-arrow-right"></i> Déconnexion
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

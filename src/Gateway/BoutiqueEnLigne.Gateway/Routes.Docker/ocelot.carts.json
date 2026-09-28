@@ -1,0 +1,31 @@
+{
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/api/carts/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/carts/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cart-service",
+          "Port": 8080
+        }
+      ],
+      "SwaggerKey": "carts"
+    },
+    {
+      "UpstreamPathTemplate": "/api/carts",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/carts",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cart-service",
+          "Port": 8080
+        }
+      ],
+      "SwaggerKey": "carts",
+      "Priority": 1
+    }
+  ]
+}

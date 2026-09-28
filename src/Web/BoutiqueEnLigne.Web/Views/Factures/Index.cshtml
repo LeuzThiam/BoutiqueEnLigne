@@ -1,0 +1,48 @@
+@model IEnumerable<BoutiqueEnLigne.Web.Models.Facture>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Mes Factures";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Historique des Factures</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            Vous n'avez pas encore de factures disponibles.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover shadow-sm rounded">
+                <thead class="table-secondary">
+                    <tr>
+                        <th># Facture</th>
+                        <th>Date</th>
+                        <th>Client</th>
+                        <th>Montant</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var facture in Model)
+                    {
+                        <tr>
+                            <td>@facture.Id</td>
+                            <td>@facture.DateFacture.ToString("dd/MM/yyyy")</td>
+                            <td>@facture.Client?.Nom @facture.Client?.Prenom</td>
+                            <td>@facture.MontantTotal.ToString("C")</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@facture.Id">Voir</a>
+                                <a class="btn btn-sm btn-outline-secondary" asp-action="TelechargerPdf" asp-route-id="@facture.Id">Télécharger</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

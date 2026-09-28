@@ -1,0 +1,59 @@
+{
+  "SwaggerEndPoints": [
+    {
+      "Key": "users",
+      "TransformByOcelotConfig": false,
+      "Config": [
+        {
+          "Name": "Service Utilisateur (API REST)",
+          "Version": "1.0",
+          "Url": "http://user-service:8080/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "products",
+      "TransformByOcelotConfig": false,
+      "Config": [
+        {
+          "Name": "Service Produit (API REST)",
+          "Version": "1.0",
+          "Url": "http://product-service:8080/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "carts",
+      "TransformByOcelotConfig": false,
+      "Config": [
+        {
+          "Name": "Service Panier (API REST)",
+          "Version": "1.0",
+          "Url": "http://cart-service:8080/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "orders",
+      "TransformByOcelotConfig": false,
+      "Config": [
+        {
+          "Name": "Service Commande (API REST)",
+          "Version": "1.0",
+          "Url": "http://order-service:8080/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "payments",
+      "TransformByOcelotConfig": false,
+      "Config": [
+        {
+          "Name": "Service Paiement (API REST)",
+          "Version": "1.0",
+          "Url": "http://payment-service:8080/swagger/v1/swagger.json"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+@model BoutiqueEnLigne.Web.Models.Facture
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = $"Facture #{Model.Id}";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Détails de la Facture #@Model.Id</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Informations Client</h5>
+            <p><strong>Client :</strong> @Model.Client?.Prenom @Model.Client?.Nom</p>
+            <p><strong>Email :</strong> @Model.Client?.Email</p>
+            <p><strong>Date de la facture :</strong> @Model.DateFacture.ToString("dd/MM/yyyy")</p>
+
+            <hr />
+
+            <h5 class="card-title">Produits facturés</h5>
+            <table class="table table-sm table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>Produit</th>
+                        <th>Quantité</th>
+                        <th>Prix unitaire</th>
+                        <th>Sous-total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ArticlesFactures)
+                    {
+                        <tr>
+                            <td>@item.Produit?.Nom</td>
+                            <td>@item.Quantite</td>
+                            <td>@item.Produit?.Prix.ToString("C")</td>
+                            <td>@((item.Produit?.Prix ?? 0m) * item.Quantite).ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="text-end mt-3">
+                <h5><strong>Total : @Model.MontantTotal.ToString("C")</strong></h5>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-action="Index" class="btn btn-outline-secondary">Retour à la liste</a>
+                <a asp-action="TelechargerPdf" asp-route-id="@Model.Id" class="btn btn-primary">Télécharger PDF</a>
+            </div>
+        </div>
+    </div>
+</div>

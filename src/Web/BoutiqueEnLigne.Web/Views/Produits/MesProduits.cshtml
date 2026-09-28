@@ -1,0 +1,67 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model IEnumerable<BoutiqueEnLigne.Web.Models.Produit>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Mes Produits";
+    var cultureCA = System.Globalization.CultureInfo.GetCultureInfo("fr-CA");
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Mes Produits</h2>
+
+    <div class="text-end mb-3">
+        <a asp-action="Creer" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Ajouter un produit
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            Vous n'avez pas encore ajouté de produits.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Marque</th>
+                        <th>Catégorie</th>
+                        <th>Prix</th>
+                        <th>Remise (%)</th>
+                        <th>Note</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var produit in Model)
+                    {
+                        <tr>
+                            <td>@produit.Nom</td>
+                            <td>@produit.Marque</td>
+                            <td>@produit.CategorieNom</td>
+                            <td>@produit.Prix.ToString("C", cultureCA)</td>
+                            <td>@produit.PourcentageRemise?.ToString("0.##")</td>
+                            <td>@produit.Note?.ToString("0.0")</td>
+                            <td>@produit.QuantiteEnStock</td>
+                            <td>
+                                <a asp-action="Modifier" asp-route-id="@produit.Id" class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="bi bi-pencil"></i> Modifier
+                                </a>
+                                <a asp-action="Supprimer" asp-route-id="@produit.Id" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Supprimer
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

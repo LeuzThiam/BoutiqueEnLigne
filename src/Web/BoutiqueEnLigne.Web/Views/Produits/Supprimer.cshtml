@@ -1,0 +1,35 @@
+@model BoutiqueEnLigne.Web.Models.Produit
+
+@{
+    ViewBag.Title = "Supprimer un produit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var cultureCA = System.Globalization.CultureInfo.GetCultureInfo("fr-CA");
+}
+
+<div class="container mt-5">
+    <h2 class="text-danger">Supprimer le produit</h2>
+    <hr />
+    <p class="text-danger">Voulez-vous vraiment supprimer ce produit ? Cette action est irréversible.</p>
+
+    <dl class="row">
+        <dt class="col-sm-3">Nom</dt>
+        <dd class="col-sm-9">@Model.Nom</dd>
+
+        <dt class="col-sm-3">Description</dt>
+        <dd class="col-sm-9">@Model.Description</dd>
+
+        <dt class="col-sm-3">Prix</dt>
+        <dd class="col-sm-9">@Model.Prix.ToString("C", cultureCA)</dd>
+
+        <dt class="col-sm-3">Catégorie</dt>
+        <dd class="col-sm-9">@Model.CategorieNom</dd>
+    </dl>
+
+    <form asp-action="Supprimer" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Supprimer</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Annuler</a>
+    </form>
+</div>
+

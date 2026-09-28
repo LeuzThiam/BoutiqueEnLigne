@@ -1,0 +1,111 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Ma Boutique</title>
+
+    <!-- Bootstrap 5 + Icons (local assets) -->
+    <link rel="stylesheet" href="~/twitter-bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/bootstrap-icons/font/bootstrap-icons.css" />
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- NAVBAR STICKY -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-shop-window"></i> Ma Boutique
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Produits" asp-action="Index">Catalogue</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Panier" asp-action="Index">
+                            Panier <i class="bi bi-cart"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Commandes" asp-action="Index">Commandes</a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> @User.Identity.Name
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-controller="Compte" asp-action="Profil">Profil</a></li>
+                                <li><a class="dropdown-item" asp-controller="Factures" asp-action="Index">Mes Factures</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" asp-controller="Compte" asp-action="Deconnexion">Déconnexion</a></li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Compte" asp-action="Connexion">Connexion</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Compte" asp-action="Inscription">Créer un compte</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SECTION HERO -->
+    <section class="hero-section bg-light text-center py-5">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Bienvenue sur Ma Boutique en ligne !</h1>
+            <p class="lead">Explorez nos meilleures offres et découvrez des produits exclusifs.</p>
+            <a href="#offres" class="btn btn-warning btn-lg mt-3">
+                <i class="bi bi-lightning-fill"></i> Voir nos offres du moment
+            </a>
+        </div>
+    </section>
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="flex-grow-1">
+        <div class="container my-5">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-4 text-center bg-primary text-white mt-auto">
+        <div class="container">
+            <p class="mb-1">© 2025 - Ma Boutique en ligne</p>
+            <p>
+                <a asp-controller="Home" asp-action="Index" class="text-white">Accueil</a> |
+                <a asp-controller="Produits" asp-action="Index" class="text-white">Produits</a> |
+                <a asp-controller="Compte" asp-action="Inscription" class="text-white">Inscription</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle -->
+    <script src="~/twitter-bootstrap/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+@model BoutiqueEnLigne.Web.Models.Utilisateur
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Inscription";
+}
+
+<section class="d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 160px);">
+    <div class="card shadow p-4 w-100" style="max-width: 500px;">
+        <h3 class="text-center mb-4">Créer un compte</h3>
+
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
+        {
+            <div class="alert alert-danger">
+                Merci de corriger les erreurs ci-dessous.
+            </div>
+        }
+
+        <form asp-action="Inscription" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label asp-for="Prenom" class="form-label">Prénom</label>
+                <input asp-for="Prenom" class="form-control" placeholder="Votre prénom" />
+                <span asp-validation-for="Prenom" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Nom" class="form-label">Nom</label>
+                <input asp-for="Nom" class="form-control" placeholder="Votre nom" />
+                <span asp-validation-for="Nom" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Adresse Email</label>
+                <input asp-for="Email" type="email" class="form-control" placeholder="exemple@mail.com" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="MotDePasse" class="form-label">Mot de passe</label>
+                <input asp-for="MotDePasse" type="password" class="form-control" placeholder="********" minlength="6" />
+                <span asp-validation-for="MotDePasse" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Role" class="form-label">Rôle</label>
+                <select asp-for="Role" asp-items="Html.GetEnumSelectList<BoutiqueEnLigne.Web.Models.RoleUtilisateur>()" class="form-select">
+                    <option value="">-- Sélectionnez un rôle --</option>
+                </select>
+                <span asp-validation-for="Role" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">
+                <i class="bi bi-person-plus-fill"></i> Créer mon compte
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <small>
+                Déjà inscrit ?
+                <a asp-controller="Compte" asp-action="Connexion" class="link-primary">Se connecter</a>
+            </small>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net9.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BoutiqueEnLigne.Cart.Domain\BoutiqueEnLigne.Cart.Domain.csproj" />
+  </ItemGroup>
+</Project>

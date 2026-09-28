@@ -1,0 +1,43 @@
+@model BoutiqueEnLigne.Web.Models.Commande
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Details de la commande";
+}
+
+<section class="container py-4">
+    <h2 class="mb-3">Commande #@Model.Id</h2>
+    <p class="text-muted small">Source de donnees : @(ViewBag.DataSource == "api" ? "backend API" : "base locale")</p>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <p><strong>Date :</strong> @Model.DateCommande.ToString("dd/MM/yyyy HH:mm")</p>
+            <p><strong>Statut :</strong> @(Model.EstPayee ? "Payee" : "En attente")</p>
+            <p><strong>Total :</strong> @Model.Total.ToString("C")</p>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th>Prix unitaire</th>
+                    <th>Quantite</th>
+                    <th>Sous-total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var article in Model.ArticlesCommandes)
+                {
+                    <tr>
+                        <td>@article.Produit?.Nom</td>
+                        <td>@article.PrixUnitaire.ToString("C")</td>
+                        <td>@article.Quantite</td>
+                        <td>@((article.PrixUnitaire * article.Quantite).ToString("C"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

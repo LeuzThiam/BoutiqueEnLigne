@@ -1,0 +1,21 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Confirmation";
+}
+
+<section class="container py-5 text-center">
+    <div class="card shadow-sm mx-auto" style="max-width: 600px;">
+        <div class="card-body p-5">
+            <h2 class="mb-3">Paiement confirme</h2>
+            <p class="lead">Votre commande a bien ete enregistree.</p>
+            @if (ViewBag.CommandeId != null)
+            {
+                <p><strong>Numero de commande :</strong> #@ViewBag.CommandeId</p>
+            }
+            <div class="mt-4 d-flex justify-content-center gap-2">
+                <a asp-controller="Commandes" asp-action="Index" class="btn btn-primary">Voir mes commandes</a>
+                <a asp-controller="Produits" asp-action="Index" class="btn btn-outline-secondary">Retour au catalogue</a>
+            </div>
+        </div>
+    </div>
+</section>

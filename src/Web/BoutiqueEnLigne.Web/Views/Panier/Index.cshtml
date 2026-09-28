@@ -1,0 +1,62 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model BoutiqueEnLigne.Web.Models.Panier
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Mon Panier";
+}
+
+<section class="container py-4">
+    <h2 class="mb-4 text-center">Votre Panier</h2>
+
+    @if (Model == null || Model.ArticlesPaniers == null || !Model.ArticlesPaniers.Any())
+    {
+        <div class="alert alert-info text-center">Votre panier est vide pour le moment.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Produit</th>
+                        <th>Prix unitaire</th>
+                        <th>Quantite</th>
+                        <th>Sous-total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var article in Model.ArticlesPaniers)
+                    {
+                        <tr>
+                            <td>@article.Produit?.Nom</td>
+                            <td>@article.Produit?.Prix.ToString("C")</td>
+                            <td>@article.Quantite</td>
+                            <td>@(((article.Produit?.Prix ?? 0m) * article.Quantite).ToString("C"))</td>
+                            <td>
+                                <form asp-action="Supprimer" asp-controller="Panier" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="idProduit" value="@article.ProduitId" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Retirer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end fw-bold">Total :</td>
+                        <td colspan="2" class="fw-bold">@ViewBag.Total.ToString("C")</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="text-end mt-3">
+            <a class="btn btn-success" asp-controller="Paiement" asp-action="Index">
+                Passer au paiement
+            </a>
+        </div>
+    }
+</section>

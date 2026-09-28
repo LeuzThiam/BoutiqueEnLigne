@@ -1,0 +1,59 @@
+@model IEnumerable<BoutiqueEnLigne.Web.Models.Commande>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Historique de mes commandes";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Mes Commandes</h2>
+    <p class="text-center text-muted small">Source de donnees : @(ViewBag.DataSource == "api" ? "backend API" : "base locale")</p>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            Vous n'avez pas encore passé de commande.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped shadow-sm rounded overflow-hidden">
+                <thead class="table-primary">
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Montant Total</th>
+                        <th>Statut</th>
+                        <th>Détails</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var commande in Model)
+                    {
+                        <tr>
+                            <td>@commande.Id</td>
+                            <td>@commande.DateCommande.ToString("dd/MM/yyyy")</td>
+                            <td>@commande.Total.ToString("C")</td>
+                            <td>
+                                @if (commande.EstPayee)
+                                {
+                                    <span class="badge bg-success">Payée</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">En attente</span>
+                                }
+                            </td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@commande.Id">
+                                    Voir détails
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
